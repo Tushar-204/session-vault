@@ -27,18 +27,24 @@ registerWorkspaceSockets(io);
 
 // Start server after connecting to MongoDB
 const startServer = async () => {
-  await connectDB();
+  try {
+    await connectDB();
 
-  server.listen(PORT, () => {
-    console.log(`
+    server.listen(PORT, () => {
+      console.log(`
 ==================================================
   🚀 SESSIONVAULT ENTERPRISE BACKEND ONLINE
   📡 PORT: ${PORT}
   🌐 MODE: ${process.env.NODE_ENV || 'development'}
-  🔗 API: http://localhost:${PORT}/api/v1/health
+  🔗 CLIENT: ${CLIENT_URL}
+  ❤️  HEALTH: /api/v1/health
 ==================================================
-    `);
-  });
+      `);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
 };
 
 startServer();
