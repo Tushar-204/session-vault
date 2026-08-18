@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SessionVault Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <h2>⚡ SessionVault Settings</h2>
+
+    <div class="card">
+      <h3>Server Configuration</h3>
+      <div class="form-group">
+        <label for="api-url">API Server URL</label>
+        <input type="url" id="api-url" placeholder="http://localhost:5000" />
+      </div>
+      <div class="form-group">
+        <label for="save-interval">Auto-Save Interval (minutes)</label>
+        <input type="number" id="save-interval" min="1" max="60" value="5" />
+      </div>
+      <label class="toggle-label">
+        <input type="checkbox" id="auto-save" checked />
+        <span>Enable Auto-Save</span>
+      </label>
+      <button id="btn-save-options" class="btn btn-primary">Save Settings</button>
+      <div id="status-msg" class="status-msg"></div>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

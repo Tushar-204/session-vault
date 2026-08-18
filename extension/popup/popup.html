@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SessionVault</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-group">
+        <div class="logo-icon">⚡</div>
+        <h2>SessionVault</h2>
+      </div>
+      <span class="badge" id="tab-counter">0 Tabs</span>
+    </div>
+
+    <!-- Login View -->
+    <div id="auth-view" class="card hidden">
+      <h3>Sign in to Sync</h3>
+      <p class="subtitle">Connect your SessionVault account</p>
+      <input type="email" id="email" placeholder="Email address" class="input" />
+      <input type="password" id="password" placeholder="Password" class="input" />
+      <button id="btn-login" class="btn btn-primary">Sign In</button>
+      <div id="auth-error" class="error-msg"></div>
+    </div>
+
+    <!-- Main Workspace Capture View -->
+    <div id="main-view" class="card">
+      <div class="form-group">
+        <label for="workspace-title">Workspace Name</label>
+        <input type="text" id="workspace-title" class="input" placeholder="e.g. React 19 Research" />
+      </div>
+
+      <div class="form-group">
+        <label for="workspace-tags">Tags (comma separated)</label>
+        <input type="text" id="workspace-tags" class="input" placeholder="dev, docs, github" />
+      </div>
+
+      <div class="tab-preview">
+        <h4>Tabs to Save (<span id="preview-count">0</span>)</h4>
+        <ul id="tab-list" class="tab-list"></ul>
+      </div>
+
+      <div class="actions">
+        <button id="btn-save-session" class="btn btn-primary">Save Session</button>
+        <button id="btn-open-dashboard" class="btn btn-secondary">Dashboard</button>
+      </div>
+
+      <div id="status-msg" class="status-msg"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

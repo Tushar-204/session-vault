@@ -1,0 +1,17 @@
+- generic [ref=f2e4]:
+  - generic [ref=f2e5]:
+    - heading "Welcome Back" [level=1] [ref=f2e11]
+    - paragraph [ref=f2e12]: Sign in to your SessionVault workspace manager
+  - generic [ref=f2e13]:
+    - generic [ref=f2e14]:
+      - generic [ref=f2e15]:
+        - generic [ref=f2e16]: Email Address
+        - textbox "name@company.com" [ref=f2e21]
+      - generic [ref=f2e22]:
+        - generic [ref=f2e23]: Password
+        - textbox "••••••••" [ref=f2e29]
+      - button "Sign In" [ref=f2e30] [cursor=pointer]
+    - generic [ref=f2e34]:
+      - text: Don't have an account?
+      - link "Create Account" [ref=f2e35] [cursor=pointer]:
+        - /url: /register
