@@ -2,7 +2,14 @@
  * SessionVault Chrome Extension Background Service Worker (Manifest V3)
  */
 
-const API_BASE = 'http://localhost:5000/api/v1';
+let API_BASE = 'http://localhost:5000/api/v1';
+let CLIENT_URL = 'http://localhost:5173';
+
+async function loadConfig() {
+  const stored = await chrome.storage.local.get(['apiUrl', 'clientUrl']);
+  if (stored.apiUrl) API_BASE = stored.apiUrl;
+  if (stored.clientUrl) CLIENT_URL = stored.clientUrl;
+}
 
 // Setup Context Menus on Installation
 chrome.runtime.onInstalled.addListener(() => {
@@ -22,7 +29,8 @@ chrome.runtime.onInstalled.addListener(() => {
 // Handle Context Menu Clicks
   chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === 'open-sessionvault-dashboard') {
-      chrome.tabs.create({ url: 'http://localhost:5173' });
+      await loadConfig();
+      chrome.tabs.create({ url: CLIENT_URL });
     } else if (info.menuItemId === 'save-current-window') {
       await saveCurrentWindowSession();
     }
@@ -42,6 +50,7 @@ chrome.runtime.onInstalled.addListener(() => {
 // Function to capture current window tabs and send to SessionVault API
 async function saveCurrentWindowSession() {
   try {
+    await loadConfig();
     const tabs = await chrome.tabs.query({ currentWindow: true });
     const authData = await chrome.storage.local.get(['token']);
 

@@ -1,19 +1,22 @@
 const API_BASE_INPUT = document.getElementById('api-url');
+const CLIENT_URL_INPUT = document.getElementById('client-url');
 const SAVE_INTERVAL_INPUT = document.getElementById('save-interval');
 const AUTO_SAVE_CHECK = document.getElementById('auto-save');
 const SAVE_BTN = document.getElementById('btn-save-options');
 const STATUS_MSG = document.getElementById('status-msg');
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const stored = await chrome.storage.local.get(['apiUrl', 'saveInterval', 'autoSave']);
+  const stored = await chrome.storage.local.get(['apiUrl', 'clientUrl', 'saveInterval', 'autoSave']);
 
   if (stored.apiUrl) API_BASE_INPUT.value = stored.apiUrl;
+  if (stored.clientUrl) CLIENT_URL_INPUT.value = stored.clientUrl;
   if (stored.saveInterval) SAVE_INTERVAL_INPUT.value = stored.saveInterval;
   if (stored.autoSave !== undefined) AUTO_SAVE_CHECK.checked = stored.autoSave;
 });
 
 SAVE_BTN.addEventListener('click', async () => {
   const apiUrl = API_BASE_INPUT.value.trim();
+  const clientUrl = CLIENT_URL_INPUT.value.trim();
   const saveInterval = parseInt(SAVE_INTERVAL_INPUT.value, 10) || 5;
   const autoSave = AUTO_SAVE_CHECK.checked;
 
@@ -23,7 +26,7 @@ SAVE_BTN.addEventListener('click', async () => {
     return;
   }
 
-  await chrome.storage.local.set({ apiUrl, saveInterval, autoSave });
+  await chrome.storage.local.set({ apiUrl, clientUrl, saveInterval, autoSave });
   STATUS_MSG.textContent = 'Settings saved successfully!';
   STATUS_MSG.style.color = '#4ade80';
   setTimeout(() => { STATUS_MSG.textContent = ''; }, 3000);

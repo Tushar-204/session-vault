@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Download, Upload, FileJson, Copy, Check, AlertTriangle } from 'lucide-react';
 import { useWorkspaces } from '../hooks/useWorkspaces';
 import toast from 'react-hot-toast';
+import api from '../utils/api';
 
 const ImportExport = () => {
   const { workspaces } = useWorkspaces({ limit: 100 });
@@ -76,15 +77,10 @@ const ImportExport = () => {
       setImportStatus({ loading: true, message: 'Importing sessions...' });
 
       const importPayload = { sessions: parsed.sessions };
-      const res = await fetch('http://localhost:5000/api/v1/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
-        body: JSON.stringify(importPayload),
-      });
+      const res = await api.post('/import', importPayload);
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Import failed.');
+      if (res.status !== 200 && res.status !== 201) {
+        throw new Error(res.data?.message || 'Import failed.');
       }
 
       setImportStatus({ loading: false, message: 'Sessions imported successfully!', success: true });

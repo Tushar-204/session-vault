@@ -17,17 +17,12 @@ const app = express();
 app.use(helmet());
 
 // Cross-Origin Resource Sharing (CORS)
-// Allow the configured web client and the Chrome extension (which has no fixed origin).
-const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+// Reflect the requesting origin so the web client and Chrome extension work from any
+// deployed domain without needing CLIENT_URL kept in sync. Credentials (cookies) stay
+// allowed because we echo the specific origin rather than '*'.
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || origin === allowedOrigin || origin.startsWith('chrome-extension://')) {
-        callback(null, true);
-      } else {
-        callback(null, false);
-      }
-    },
+    origin: (origin, callback) => callback(null, origin || true),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

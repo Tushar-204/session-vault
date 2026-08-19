@@ -1,6 +1,11 @@
-const API_BASE = 'http://localhost:5000/api/v1';
+let API_BASE = 'http://localhost:5000/api/v1';
+let CLIENT_URL = 'http://localhost:5173';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const stored = await chrome.storage.local.get(['apiUrl', 'clientUrl']);
+  if (stored.apiUrl) API_BASE = stored.apiUrl;
+  if (stored.clientUrl) CLIENT_URL = stored.clientUrl;
+
   const authView = document.getElementById('auth-view');
   const mainView = document.getElementById('main-view');
   const tabCounter = document.getElementById('tab-counter');
@@ -11,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnSave = document.getElementById('btn-save-session');
   const btnDashboard = document.getElementById('btn-open-dashboard');
   const btnLogin = document.getElementById('btn-login');
+  const btnLogout = document.getElementById('btn-logout');
   const statusMsg = document.getElementById('status-msg');
 
   // Check stored auth token
@@ -129,6 +135,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Open Dashboard
   btnDashboard.addEventListener('click', () => {
-    chrome.tabs.create({ url: 'http://localhost:5173' });
+    chrome.tabs.create({ url: CLIENT_URL });
+  });
+
+  // Logout
+  btnLogout.addEventListener('click', async () => {
+    try {
+      const currentToken = (await chrome.storage.local.get(['token'])).token;
+      if (currentToken) {
+        await fetch(`${API_BASE}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${currentToken}` },
+        });
+      }
+    } catch (_) {
+      // best-effort; clear local session regardless
+    }
+    await chrome.storage.local.remove(['token']);
+    mainView.classList.add('hidden');
+    authView.classList.remove('hidden');
   });
 });
