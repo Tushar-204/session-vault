@@ -1,8 +1,11 @@
 import { Router } from 'express';
-import { createShareLink, getSharedWorkspace } from '../controllers/sharedLink.controller.js';
+import { listMySharedLinks, createShareLink, getSharedWorkspace } from '../controllers/sharedLink.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
 const router = Router();
+
+// List the current user's shared links
+router.get('/', authenticate, listMySharedLinks);
 
 // Public route to view a shared session
 router.get('/:code', getSharedWorkspace);

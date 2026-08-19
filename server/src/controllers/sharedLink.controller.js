@@ -2,6 +2,11 @@ import { sharedLinkService } from '../services/sharedLink.service.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 
+export const listMySharedLinks = asyncHandler(async (req, res) => {
+  const links = await sharedLinkService.listUserLinks(req.user._id);
+  res.status(200).json(new ApiResponse(200, links, 'Shared links retrieved.'));
+});
+
 export const createShareLink = asyncHandler(async (req, res) => {
   const { workspaceId } = req.params;
   const link = await sharedLinkService.createShareLink(req.user._id, workspaceId, req.body);

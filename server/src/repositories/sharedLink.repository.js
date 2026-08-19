@@ -10,6 +10,15 @@ export class SharedLinkRepository {
       .populate('createdBy', 'fullName avatar');
   }
 
+  async findByUser(userId) {
+    return await SharedLink.find({ createdBy: userId })
+      .populate({
+        path: 'workspaceId',
+        select: 'title description color icon tags tabCount',
+      })
+      .sort({ createdAt: -1 });
+  }
+
   async create(sharedLinkData) {
     return await SharedLink.create(sharedLinkData);
   }

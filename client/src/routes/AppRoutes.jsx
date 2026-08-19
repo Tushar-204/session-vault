@@ -13,6 +13,7 @@ import { Trash } from '../pages/Trash';
 import { Analytics } from '../pages/Analytics';
 import { Settings } from '../pages/Settings';
 import { SharedView } from '../pages/SharedView';
+import { SharedLinks } from '../pages/SharedLinks';
 import  SearchPage  from '../pages/Search';
 import ImportExportPage from '../pages/ImportExport';
 
@@ -61,6 +62,7 @@ export const AppRoutes = () => {
         <Route path="analytics" element={<Analytics />} />
         <Route path="trash" element={<Trash />} />
         <Route path="search" element={<SearchPage />} />
+        <Route path="shared" element={<SharedLinks />} />
         <Route path="import-export" element={<ImportExportPage />} />
         <Route path="settings" element={<Settings />} />
       </Route>

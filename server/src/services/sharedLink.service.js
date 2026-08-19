@@ -18,6 +18,10 @@ export class SharedLinkService {
     return link;
   }
 
+  async listUserLinks(userId) {
+    return await sharedLinkRepository.findByUser(userId);
+  }
+
   async getSharedWorkspace(shareCode) {
     const link = await sharedLinkRepository.findByCode(shareCode);
 
