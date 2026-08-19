@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Share2, Copy, Check, ExternalLink, Layers, Eye } from 'lucide-react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import { shareTargets } from '../components/modules/shareTargets';
 
 export const SharedLinks = () => {
   const [links, setLinks] = useState([]);
@@ -21,13 +22,21 @@ export const SharedLinks = () => {
     fetchLinks();
   }, []);
 
+  const urlFor = (code) => `${window.location.origin}/share/${code}`;
+
   const copy = async (code) => {
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/share/${code}`);
+      await navigator.clipboard.writeText(urlFor(code));
       toast.success('Link copied!');
     } catch {
       toast.error('Copy failed.');
     }
+  };
+
+  const shareTo = (target, link) => {
+    const url = urlFor(link.shareCode);
+    const message = `Check out this session on SessionVault: ${link.workspaceId?.title || 'Shared Workspace'}`;
+    window.open(target.build(url, message, message), '_blank', 'noopener,noreferrer,width=680,height=520');
   };
 
   if (loading) {
@@ -56,7 +65,7 @@ export const SharedLinks = () => {
           {links.map((link) => (
             <div
               key={link._id}
-              className="glass-panel border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-4"
+              className="glass-panel border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-100 truncate">
@@ -72,6 +81,19 @@ export const SharedLinks = () => {
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
+                {/* App share logos */}
+                {shareTargets.map((target) => (
+                  <button
+                    key={target.key}
+                    onClick={() => shareTo(target, link)}
+                    title={`Share to ${target.label}`}
+                    className="h-8 w-8 rounded-lg flex items-center justify-center text-white transition-transform hover:scale-105"
+                    style={{ backgroundColor: target.color }}
+                  >
+                    {target.icon}
+                  </button>
+                ))}
+
                 <a
                   href={`/share/${link.shareCode}`}
                   target="_blank"
