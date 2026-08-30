@@ -31,3 +31,5 @@ SAVE_BTN.addEventListener('click', async () => {
   STATUS_MSG.style.color = '#4ade80';
   setTimeout(() => { STATUS_MSG.textContent = ''; }, 3000);
 });
+
+console.log(apiUrl)

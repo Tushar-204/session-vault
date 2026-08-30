@@ -20,8 +20,12 @@ export const restoreTabs = (tabs) => {
   setTimeout(() => {
     window.removeEventListener('message', onAck);
     if (!handled) {
-      urls.forEach((u) => window.open(u, '_blank'));
+      // Extension bridge not present — popup blockers would only allow the first tab,
+      // so open just that one and tell the user to install the extension for the rest.
+      if (urls[0]) window.open(urls[0], '_blank');
+      toast.error('Install the SessionVault extension to restore all tabs at once.');
+    } else {
+      toast.success(`Restoring ${urls.length} tab${urls.length > 1 ? 's' : ''}...`);
     }
-    toast.success(`Restoring ${urls.length} tab${urls.length > 1 ? 's' : ''}...`);
-  }, 350);
+  }, 500);
 };
