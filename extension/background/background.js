@@ -5,9 +5,15 @@
 let API_BASE = 'http://localhost:5000/api/v1';
 let CLIENT_URL = 'http://localhost:5173';
 
+// Accept any pasted form (https://host, https://host/api/v1) and always end with /api/v1.
+const withApiPath = (url) => {
+  const clean = url.replace(/\/+$/, '');
+  return /\/api\/v\d+$/.test(clean) ? clean : `${clean}/api/v1`;
+};
+
 async function loadConfig() {
   const stored = await chrome.storage.local.get(['apiUrl', 'clientUrl']);
-  if (stored.apiUrl) API_BASE = stored.apiUrl;
+  if (stored.apiUrl) API_BASE = withApiPath(stored.apiUrl);
   if (stored.clientUrl) CLIENT_URL = stored.clientUrl;
 }
 

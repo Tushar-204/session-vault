@@ -1,8 +1,10 @@
 import { User } from '../models/user.model.js';
 
 export class UserRepository {
-  async findById(id) {
-    return await User.findById(id);
+  async findById(id, includePassword = false) {
+    const query = User.findById(id);
+    if (includePassword) query.select('+password');
+    return await query;
   }
 
   async findByEmail(email, includePassword = false) {

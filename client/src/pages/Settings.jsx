@@ -1,9 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Settings as SettingsIcon, User, Shield, Bell, Palette } from 'lucide-react';
+import api from '../utils/api';
+import toast from 'react-hot-toast';
+import { Settings as SettingsIcon, User, Shield, Bell, Loader2 } from 'lucide-react';
 
 export const Settings = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
+
+  const [fullName, setFullName] = useState(user?.fullName || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [savingPassword, setSavingPassword] = useState(false);
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    try {
+      const res = await api.patch('/auth/profile', { fullName, email });
+      setUser(res.data.data.user);
+      toast.success('Profile updated!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update profile.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setSavingPassword(true);
+    try {
+      await api.patch('/auth/password', { currentPassword, newPassword });
+      setCurrentPassword('');
+      setNewPassword('');
+      toast.success('Password updated!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update password.');
+    } finally {
+      setSavingPassword(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -41,12 +80,15 @@ export const Settings = () => {
             </div>
           </div>
 
-          <div className="space-y-3 pt-2">
+          <form onSubmit={handleSaveProfile} className="space-y-3 pt-2">
             <div>
               <label className="text-xs font-semibold text-slate-400 block mb-1">Full Name</label>
               <input
                 type="text"
-                defaultValue={user?.fullName}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                minLength={2}
                 className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-blue-500"
               />
             </div>
@@ -54,14 +96,20 @@ export const Settings = () => {
               <label className="text-xs font-semibold text-slate-400 block mb-1">Email Address</label>
               <input
                 type="email"
-                defaultValue={user?.email}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-blue-500"
               />
             </div>
-            <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-600/25 transition-all cursor-pointer">
-              Save Changes
+            <button
+              type="submit"
+              disabled={savingProfile}
+              className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-600/25 transition-all cursor-pointer disabled:opacity-60"
+            >
+              {savingProfile ? 'Saving...' : 'Save Changes'}
             </button>
-          </div>
+          </form>
         </div>
 
         {/* Security Section */}
@@ -71,17 +119,38 @@ export const Settings = () => {
               <Shield className="h-4 w-4 text-emerald-400" />
               <h3 className="text-sm font-bold text-slate-200">Security</h3>
             </div>
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-400 block">New Password</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-            <button className="w-full px-4 py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 text-xs font-bold rounded-xl transition-all cursor-pointer">
-              Update Password
-            </button>
+            <form onSubmit={handleUpdatePassword} className="space-y-2">
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block">Current Password</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-400 block">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={savingPassword}
+                className="w-full px-4 py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-60"
+              >
+                {savingPassword ? 'Updating...' : 'Update Password'}
+              </button>
+            </form>
           </div>
 
           <div className="glass-panel border border-slate-800 rounded-2xl p-5">

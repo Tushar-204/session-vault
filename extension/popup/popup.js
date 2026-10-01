@@ -1,9 +1,15 @@
 let API_BASE = 'http://localhost:5000/api/v1';
 let CLIENT_URL = 'http://localhost:5173';
 
+// Accept any pasted form (https://host, https://host/api/v1) and always end with /api/v1.
+const withApiPath = (url) => {
+  const clean = url.replace(/\/+$/, '');
+  return /\/api\/v\d+$/.test(clean) ? clean : `${clean}/api/v1`;
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
   const stored = await chrome.storage.local.get(['apiUrl', 'clientUrl']);
-  if (stored.apiUrl) API_BASE = stored.apiUrl;
+  if (stored.apiUrl) API_BASE = withApiPath(stored.apiUrl);
   if (stored.clientUrl) CLIENT_URL = stored.clientUrl;
 
   const authView = document.getElementById('auth-view');
@@ -69,16 +75,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (_) {
+        throw new Error(`server returned HTTP ${res.status} (not JSON)`);
+      }
+
       if (res.ok && data.data?.accessToken) {
         await chrome.storage.local.set({ token: data.data.accessToken });
         authView.classList.add('hidden');
         mainView.classList.remove('hidden');
       } else {
-        authError.textContent = data.message || 'Login failed.';
+        authError.textContent = data.message || `Login failed (HTTP ${res.status}).`;
       }
     } catch (err) {
-      authError.textContent = 'Unable to connect to SessionVault server.';
+      authError.textContent = `Cannot reach ${API_BASE} — ${err.message}`;
     }
   });
 

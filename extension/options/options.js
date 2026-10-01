@@ -15,16 +15,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 SAVE_BTN.addEventListener('click', async () => {
-  const apiUrl = API_BASE_INPUT.value.trim();
-  const clientUrl = CLIENT_URL_INPUT.value.trim();
+  const clean = API_BASE_INPUT.value.trim().replace(/\/+$/, '');
+  const apiUrl = /\/api\/v\d+$/.test(clean) ? clean : `${clean}/api/v1`;
+  const clientUrl = CLIENT_URL_INPUT.value.trim().replace(/\/+$/, '');
   const saveInterval = parseInt(SAVE_INTERVAL_INPUT.value, 10) || 5;
   const autoSave = AUTO_SAVE_CHECK.checked;
 
-  if (!apiUrl) {
+  if (!clean) {
     STATUS_MSG.textContent = 'Please enter a valid API URL.';
     STATUS_MSG.style.color = '#f87171';
     return;
   }
+  API_BASE_INPUT.value = apiUrl;
 
   await chrome.storage.local.set({ apiUrl, clientUrl, saveInterval, autoSave });
   STATUS_MSG.textContent = 'Settings saved successfully!';
@@ -32,4 +34,3 @@ SAVE_BTN.addEventListener('click', async () => {
   setTimeout(() => { STATUS_MSG.textContent = ''; }, 3000);
 });
 
-console.log(apiUrl)

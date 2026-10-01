@@ -70,3 +70,15 @@ export const logout = asyncHandler(async (req, res) => {
 export const getMe = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { user: req.user }, 'Current user profile fetched.'));
 });
+
+export const updateProfile = asyncHandler(async (req, res) => {
+  const { fullName, email } = req.body;
+  const user = await authService.updateProfile(req.user._id, { fullName, email });
+  res.status(200).json(new ApiResponse(200, { user }, 'Profile updated successfully.'));
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  await authService.changePassword(req.user._id, currentPassword, newPassword);
+  res.status(200).json(new ApiResponse(200, null, 'Password updated successfully.'));
+});
