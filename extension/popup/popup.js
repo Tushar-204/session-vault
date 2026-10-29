@@ -150,21 +150,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.tabs.create({ url: CLIENT_URL });
   });
 
-  // Logout
+  // Logout — clear local session first so it never depends on the network
   btnLogout.addEventListener('click', async () => {
-    try {
-      const currentToken = (await chrome.storage.local.get(['token'])).token;
-      if (currentToken) {
-        await fetch(`${API_BASE}/auth/logout`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${currentToken}` },
-        });
-      }
-    } catch (_) {
-      // best-effort; clear local session regardless
-    }
+    const { token: oldToken } = await chrome.storage.local.get(['token']);
     await chrome.storage.local.remove(['token']);
     mainView.classList.add('hidden');
     authView.classList.remove('hidden');
+    document.getElementById('auth-error').textContent = '';
+
+    // best-effort server ping; fire-and-forget, never blocks logout
+    if (oldToken) {
+      fetch(`${API_BASE}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${oldToken}` },
+      }).catch(() => {});
+    }
   });
 });
